@@ -557,7 +557,6 @@ static UISlider * _volumeSlider;
 
 - (void)_switchToFullScreen:(BOOL)fullScreen {
     _isFullScreen = fullScreen;
-    [self.fatherView.viewController setNeedsStatusBarAppearanceUpdate];
     
     /* FIXXXX
      UIDeviceOrientation targetOrientation = [self _orientationForFullScreen:fullScreen];// [UIDevice currentDevice].orientation;
@@ -660,23 +659,18 @@ static UISlider * _volumeSlider;
      _fullScreenBlackView.transform = self.transform;
      [UIView commitAnimations];
      */
-    [self _setInterfaceOrientation:UIInterfaceOrientationUnknown];
     if (orientation == UIDeviceOrientationPortrait) {
-        [self _setInterfaceOrientation:UIInterfaceOrientationPortrait];
-    } else if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeLeft) {
-        [self _setInterfaceOrientation:UIInterfaceOrientationLandscapeLeft];
+        [self _setInterfaceOrientation:UIDeviceOrientationPortrait];
+    } else if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
+        [self _setInterfaceOrientation:UIDeviceOrientationLandscapeRight];
     }
 }
 
-- (void)_setInterfaceOrientation:(UIInterfaceOrientation)orientation {
-    if ([[UIDevice currentDevice] respondsToSelector:@selector(setOrientation:)]) {
-        SEL selector = NSSelectorFromString(@"setOrientation:");
-        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[UIDevice instanceMethodSignatureForSelector:selector]];
-        [invocation setSelector:selector];
-        [invocation setTarget:[UIDevice currentDevice]];
-        UIInterfaceOrientation val = orientation;
-        [invocation setArgument:&val atIndex:2];
-        [invocation invoke];
+- (void)_setInterfaceOrientation:(UIDeviceOrientation)orientation {
+    if ([UIDevice currentDevice].orientation == orientation) {
+        [UIViewController attemptRotationToDeviceOrientation];
+    } else {
+        [[UIDevice currentDevice] setValue:@(orientation) forKey:@"orientation"];
     }
 }
 

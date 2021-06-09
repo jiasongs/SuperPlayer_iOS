@@ -124,7 +124,9 @@ static UISlider * _volumeSlider;
     LOG_ME;
     // 移除通知
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    if (![UIDevice currentDevice].generatesDeviceOrientationNotifications) {
+        [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    }
     
     [self reportPlay];
     [self.netWatcher stopWatch];
@@ -143,10 +145,10 @@ static UISlider * _volumeSlider;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterPlayground:) name:UIApplicationDidBecomeActiveNotification object:nil];
     
     // 监测设备方向
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onStatusBarOrientationChange)
-                                                 name:UIApplicationDidChangeStatusBarOrientationNotification
-                                               object:nil];
+    if (![UIDevice currentDevice].generatesDeviceOrientationNotifications) {
+        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    }
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDeviceOrientationChange) name:UIDeviceOrientationDidChangeNotification object:nil];
     
 }
 
@@ -670,6 +672,7 @@ static UISlider * _volumeSlider;
     if ([UIDevice currentDevice].orientation == orientation) {
         [UIViewController attemptRotationToDeviceOrientation];
     } else {
+        [[UIDevice currentDevice] setValue:@(UIInterfaceOrientationUnknown) forKey:@"orientation"];
         [[UIDevice currentDevice] setValue:@(orientation) forKey:@"orientation"];
     }
 }
@@ -839,25 +842,32 @@ static UISlider * _volumeSlider;
     }
 }
 
-// 状态条变化通知（在前台播放才去处理）
-- (void)onStatusBarOrientationChange {
-    [self onDeviceOrientationChange];
-}
-
 /**
  *  屏幕方向发生变化会调用这里
  */
-- (void)onDeviceOrientationChange {
-    if (!self.isLoaded) { return; }
-    if (self.isLockScreen) { return; }
-    if (self.didEnterBackground) { return; };
-    if (SuperPlayerWindowShared.isShowing) { return; }
+- (void)handleDeviceOrientationChange {
+    if (!self.isLoaded) {
+        return;
+    }
+    if (self.isLockScreen) {
+        return;
+    }
+    if (self.didEnterBackground) {
+        return;
+    }
+    if (SuperPlayerWindowShared.isShowing) {
+        return;
+    }
     UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
+    if (!UIDeviceOrientationIsValidInterfaceOrientation(orientation)) {
+        return;
+    }
     if (orientation == UIDeviceOrientationFaceUp || orientation == UIDeviceOrientationFaceDown) {
         return;
     }
     BOOL shouldFullScreen = UIDeviceOrientationIsLandscape(orientation);
     [self _switchToFullScreen:shouldFullScreen];
+    [self _setInterfaceOrientation:orientation];
 }
 
 #pragma mark -

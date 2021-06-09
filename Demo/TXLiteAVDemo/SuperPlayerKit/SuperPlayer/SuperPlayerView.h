@@ -55,7 +55,7 @@ typedef NS_ENUM(NSInteger, SuperPlayerLayoutStyle) {
 /// 是否锁定旋转
 @property (nonatomic, assign) BOOL isLockScreen;
 /// 是否是直播流
-@property (readonly) BOOL isLive;
+@property (nonatomic, assign) BOOL isLive;
 /// 超级播放器控制层
 @property (nonatomic) SuperPlayerControlView *controlView;
 /// 是否允许竖屏手势

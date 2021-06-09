@@ -85,9 +85,6 @@ typedef NS_ENUM(NSInteger, ButtonAction) {
 @property CGFloat liveProgressTime;       // 直播播放器回调过来的时间
 @property CGFloat liveProgressBase;       // 直播播放器超出时移的最大时间
 #define MAX_SHIFT_TIME  (2*60*60)
-/** 是否是直播流 */
-@property BOOL isLive;
-
 /** 腾讯点播播放器 */
 @property (nonatomic, strong) TXVodPlayer                *vodPlayer;
 /** 腾讯直播播放器 */

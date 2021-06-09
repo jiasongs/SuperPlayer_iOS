@@ -143,18 +143,11 @@ static UISlider * _volumeSlider;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterPlayground:) name:UIApplicationDidBecomeActiveNotification object:nil];
     
     // 监测设备方向
-    /* FIXXXX
-     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-     [[NSNotificationCenter defaultCenter] addObserver:self
-     selector:@selector(onDeviceOrientationChange)
-     name:UIDeviceOrientationDidChangeNotification
-     object:nil];
-     
-     [[NSNotificationCenter defaultCenter] addObserver:self
-     selector:@selector(onStatusBarOrientationChange)
-     name:UIApplicationDidChangeStatusBarOrientationNotification
-     object:nil];
-     */
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onStatusBarOrientationChange)
+                                                 name:UIApplicationDidChangeStatusBarOrientationNotification
+                                               object:nil];
+    
 }
 
 #pragma mark - layoutSubviews
@@ -563,9 +556,6 @@ static UISlider * _volumeSlider;
 }
 
 - (void)_switchToFullScreen:(BOOL)fullScreen {
-    if (_isFullScreen == fullScreen) {
-        return;
-    }
     _isFullScreen = fullScreen;
     [self.fatherView.viewController setNeedsStatusBarAppearanceUpdate];
     
@@ -784,10 +774,7 @@ static UISlider * _volumeSlider;
     
     if (_isFullScreen != fullScreen) {
         [self _adjustTransform:[self _orientationForFullScreen:fullScreen]];
-        [self _switchToFullScreen:fullScreen];
-        [self _switchToLayoutStyle:fullScreen ? SuperPlayerLayoutStyleFullScreen : SuperPlayerLayoutStyleCompact];
     }
-    _isFullScreen = fullScreen;
     /*
      self.controlView.compact = !_isFullScreen;
      if (fullScreen) {
@@ -861,31 +848,6 @@ static UISlider * _volumeSlider;
 // 状态条变化通知（在前台播放才去处理）
 - (void)onStatusBarOrientationChange {
     [self onDeviceOrientationChange];
-    return;
-    if (!self.didEnterBackground) {
-        UIInterfaceOrientation orientation = (UIInterfaceOrientation)[UIDevice currentDevice].orientation;
-        SuperPlayerLayoutStyle style = [self defaultStyleForDeviceOrientation:orientation];
-        //        [[UIApplication sharedApplication] setStatusBarOrientation:orientation animated:NO];
-        if ([UIApplication sharedApplication].statusBarOrientation != orientation) {
-            [self _adjustTransform:(UIInterfaceOrientation)[UIDevice currentDevice].orientation];
-        }
-        [self _switchToFullScreen:style == SuperPlayerLayoutStyleFullScreen];
-        [self _switchToLayoutStyle:style];
-        /*       // 获取到当前状态条的方向
-         UIInterfaceOrientation currentOrientation = [UIApplication sharedApplication].statusBarOrientation;
-         if (currentOrientation == UIInterfaceOrientationPortrait) {
-         [self setOrientationPortraitConstraint];
-         } else {
-         [self _switchToLayoutStyle:style];
-         
-         if (currentOrientation == UIInterfaceOrientationLandscapeRight) {
-         [self _switchToLayoutStyle:style];
-         } else if (currentOrientation == UIDeviceOrientationLandscapeLeft){
-         [self _switchToLayoutStyle:UIInterfaceOrientationLandscapeLeft];
-         }
-         }
-         */
-    }
 }
 
 /**
@@ -900,12 +862,8 @@ static UISlider * _volumeSlider;
     if (orientation == UIDeviceOrientationFaceUp || orientation == UIDeviceOrientationFaceDown) {
         return;
     }
-    SuperPlayerLayoutStyle style = [self defaultStyleForDeviceOrientation:[UIDevice currentDevice].orientation];
-    
     BOOL shouldFullScreen = UIDeviceOrientationIsLandscape(orientation);
     [self _switchToFullScreen:shouldFullScreen];
-    [self _adjustTransform:[self _orientationForFullScreen:shouldFullScreen]];
-    [self _switchToLayoutStyle:style];
 }
 
 #pragma mark -
@@ -1336,7 +1294,7 @@ static UISlider * _volumeSlider;
 }
 
 - (void)controlViewChangeScreen:(SuperPlayerControlView *)controlView withFullScreen:(BOOL)isFullScreen {
-    self.isFullScreen = isFullScreen;
+    self.isFullScreen = !self.isFullScreen;
 }
 
 - (void)controlViewDidChangeScreen:(UIView *)controlView

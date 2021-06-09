@@ -634,9 +634,10 @@ static UISlider * _volumeSlider;
      [_fullScreenBlackView removeFromSuperview];
      }
      */
-    self.controlView.compact = style == SuperPlayerLayoutStyleCompact;
+    
     
     /* FIXXXX
+     self.controlView.compact = style == SuperPlayerLayoutStyleCompact;
      [[UIApplication sharedApplication].keyWindow  layoutIfNeeded];
      */
     
@@ -1183,7 +1184,7 @@ static UISlider * _volumeSlider;
     return YES;
 }
 
-#pragma mark - Setter 
+#pragma mark - Setter
 
 
 /**

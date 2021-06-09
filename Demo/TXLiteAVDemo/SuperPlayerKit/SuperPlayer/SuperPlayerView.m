@@ -862,9 +862,6 @@ static UISlider * _volumeSlider;
     if (!UIDeviceOrientationIsValidInterfaceOrientation(orientation)) {
         return;
     }
-    if (orientation == UIDeviceOrientationFaceUp || orientation == UIDeviceOrientationFaceDown) {
-        return;
-    }
     BOOL shouldFullScreen = UIDeviceOrientationIsLandscape(orientation);
     [self _switchToFullScreen:shouldFullScreen];
     [self _setInterfaceOrientation:orientation];

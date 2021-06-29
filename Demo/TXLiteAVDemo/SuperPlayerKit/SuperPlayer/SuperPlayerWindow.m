@@ -17,6 +17,28 @@
 #define FLOAT_VIEW_WIDTH  200
 #define FLOAT_VIEW_HEIGHT 112
 
+@interface SuperPlayerWindowRootViewController : UIViewController
+
+@end
+
+@implementation SuperPlayerWindowRootViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor = [UIColor clearColor];
+    self.view.userInteractionEnabled = NO;
+}
+
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait;
+}
+
+@end
+
 @interface SuperPlayerWindow()<TXVodPlayListener>
 @property (weak) UIView *origFatherView;
 @property CGRect floatViewRect;
@@ -41,9 +63,7 @@
     self = [super initWithFrame:frame];
     
     self.windowLevel = UIWindowLevelStatusBar - 1;
-    self.rootViewController = [UIViewController new];
-    self.rootViewController.view.backgroundColor = [UIColor clearColor];
-    self.rootViewController.view.userInteractionEnabled = NO;
+    self.rootViewController = [SuperPlayerWindowRootViewController new];
     
     _rootView = [[UIView alloc] initWithFrame:CGRectZero];
     _rootView.backgroundColor = [UIColor blackColor];

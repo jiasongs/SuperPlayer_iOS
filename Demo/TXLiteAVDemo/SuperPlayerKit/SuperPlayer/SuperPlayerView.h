@@ -46,7 +46,8 @@ typedef NS_ENUM(NSInteger, SuperPlayerLayoutStyle) {
 @property (nonatomic, assign) SuperPlayerLayoutStyle layoutStyle;
 
 /// 设置播放器的父view。播放过程中调用可实现播放窗口转移
-@property (nonatomic, weak) UIView *fatherView;
+@property (nonatomic, weak) __kindof UIView *fatherView;
+@property (nullable, nonatomic, weak) __kindof UIViewController *viewController;
 
 /// 播放器的状态
 @property (nonatomic, assign) SuperPlayerState state;

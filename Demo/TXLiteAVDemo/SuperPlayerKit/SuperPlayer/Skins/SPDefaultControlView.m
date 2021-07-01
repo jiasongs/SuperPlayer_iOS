@@ -137,7 +137,7 @@
         make.trailing.equalTo(self.bottomImageView.mas_trailing).offset(-8);
         make.centerY.equalTo(self.startBtn.mas_centerY);
     }];
-    
+    [self.totalTimeLabel setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
     [self.totalTimeLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.trailing.equalTo(self.fullScreenBtn.mas_leading);
         make.centerY.equalTo(self.startBtn.mas_centerY);

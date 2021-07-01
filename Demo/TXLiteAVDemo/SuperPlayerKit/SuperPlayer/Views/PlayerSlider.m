@@ -59,6 +59,7 @@
     
     self.pointArray = [NSMutableArray new];
     
+    self.minimumValue = 0;
     self.maximumValue = 1;
     self.maximumTrackTintColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.5];
     

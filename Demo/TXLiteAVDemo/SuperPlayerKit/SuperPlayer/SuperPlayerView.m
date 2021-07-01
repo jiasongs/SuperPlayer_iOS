@@ -806,7 +806,7 @@ static UISlider * _volumeSlider;
     [self fastViewUnavaliable];
     [self.netWatcher stopWatch];
     self.repeatBtn.hidden = NO;
-    self.repeatBackBtn.hidden = NO;
+    self.repeatBackBtn.hidden = YES;
     if ([self.delegate respondsToSelector:@selector(superPlayerDidEnd:)]) {
         [self.delegate superPlayerDidEnd:self];
     }

@@ -700,7 +700,7 @@
 
     [self setPlayState:isPlaying];
     self.backLiveBtn.hidden = !isTimeShifting;
-    self.moreContentView.enableSpeedAndMirrorControl = !isLive;
+    self.moreContentView.enableSpeedAndMirrorControl = NO;
     
     for (UIView *subview in self.resolutionView.subviews)
         [subview removeFromSuperview];
@@ -743,6 +743,9 @@
             self.resoultionCurrentBtn = btn;
         }
     }
+    self.currentTimeLabel.hidden = isLive;
+    self.videoSlider.hidden = isLive;
+    self.totalTimeLabel.hidden = isLive;
     if (self.isLive != isLive) {
         self.isLive = isLive;
         [self setNeedsLayout];

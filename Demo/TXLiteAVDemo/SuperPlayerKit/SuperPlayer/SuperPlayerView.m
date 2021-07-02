@@ -1300,6 +1300,12 @@ static UISlider * _volumeSlider;
     self.isFullScreen = !self.isFullScreen;
 }
 
+- (void)controlViewRoute:(SuperPlayerControlView *)controlView {
+    if ([self.delegate respondsToSelector:@selector(superPlayerRouteAction:)]) {
+        [self.delegate superPlayerRouteAction:self];
+    }
+}
+
 - (void)controlViewDidChangeScreen:(UIView *)controlView
 {
     if ([self.delegate respondsToSelector:@selector(superPlayerFullScreenChanged:)]) {

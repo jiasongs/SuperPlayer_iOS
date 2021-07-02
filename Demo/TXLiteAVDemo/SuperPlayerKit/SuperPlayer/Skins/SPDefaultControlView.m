@@ -48,6 +48,7 @@
         
         
         [self addSubview:self.backLiveBtn];
+        [self addSubview:self.routeButton];
         
         // 添加子控件的约束
         [self makeSubViewsConstraints];
@@ -125,12 +126,6 @@
         make.width.mas_equalTo(60);
     }];
     
-    [self.fullScreenBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.width.height.mas_equalTo(30);
-        make.trailing.equalTo(self.bottomImageView.mas_trailing).offset(-8);
-        make.centerY.equalTo(self.startBtn.mas_centerY);
-    }];
-    
     [self.resolutionBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.height.mas_equalTo(30);
         make.width.mas_greaterThanOrEqualTo(45);
@@ -139,9 +134,19 @@
     }];
     [self.totalTimeLabel setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
     [self.totalTimeLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.trailing.equalTo(self.fullScreenBtn.mas_leading);
+        make.trailing.equalTo(self.routeButton.mas_leading);
         make.centerY.equalTo(self.startBtn.mas_centerY);
         make.width.mas_equalTo(60);
+    }];
+    [self.routeButton setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
+    [self.routeButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.trailing.equalTo(self.fullScreenBtn.mas_leading);
+        make.centerY.equalTo(self.startBtn.mas_centerY);
+    }];
+    [self.fullScreenBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.width.height.mas_equalTo(30);
+        make.trailing.equalTo(self.bottomImageView.mas_trailing).offset(-8);
+        make.centerY.equalTo(self.startBtn.mas_centerY);
     }];
     
     [self.videoSlider mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -169,9 +174,6 @@
         make.centerX.equalTo(self);
     }];
 }
-
-
-
 
 #pragma mark - Action
 
@@ -316,6 +318,10 @@
     [self fadeOut:0.1];
 }
 
+- (void)onPressRoute:(UIButton *)sender {
+    [self.delegate controlViewRoute:self];
+}
+
 - (void)setDisableBackBtn:(BOOL)disableBackBtn {
     _disableBackBtn = disableBackBtn;
     self.backBtn.hidden = disableBackBtn;
@@ -388,7 +394,7 @@
     self.resolutionView.hidden  = YES;
     
     [self.totalTimeLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
-        make.trailing.equalTo(self.fullScreenBtn.mas_leading);
+        make.trailing.equalTo(self.routeButton.mas_leading);
         make.centerY.equalTo(self.startBtn.mas_centerY);
         make.width.mas_equalTo(self.isLive?10:60);
     }];
@@ -591,6 +597,17 @@
         _moreContentView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
     }
     return _moreContentView;
+}
+
+- (UIButton *)routeButton {
+    if (!_routeButton) {
+        _routeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_routeButton setTitle:@"线路1" forState:UIControlStateNormal];
+        _routeButton.titleLabel.font = [UIFont systemFontOfSize:13];
+        [_routeButton addTarget:self action:@selector(onPressRoute:) forControlEvents:UIControlEventTouchUpInside];
+        _routeButton.contentEdgeInsets = UIEdgeInsetsMake(3, 6, 3, 6);
+    }
+    return _routeButton;
 }
 
 #pragma mark - UIGestureRecognizerDelegate

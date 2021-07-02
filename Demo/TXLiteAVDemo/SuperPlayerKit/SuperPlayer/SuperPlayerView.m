@@ -52,8 +52,11 @@ static UISlider * _volumeSlider;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wdeprecated-declarations"
 
+@interface SuperPlayerView ()
 
+@property (nonatomic, assign) BOOL finalLive;
 
+@end
 
 @implementation SuperPlayerView {
     UIView *_fullScreenBlackView;
@@ -87,6 +90,7 @@ static UISlider * _volumeSlider;
 - (void)initializeThePlayer {
     LOG_ME;
     self.isLive = YES;
+    self.finalLive = YES;
     
     self.netWatcher = [[NetWatcher alloc] init];
     
@@ -205,7 +209,7 @@ static UISlider * _volumeSlider;
     if (videoURL != nil) {
         [self configTXPlayer];
     } else if (playerModel.videoId || playerModel.videoIdV2) {
-        self.isLive = NO;
+        self.finalLive = NO;
         __weak __typeof(self) weakSelf = self;
         _currentLoadingTask = [_playerModel requestWithCompletion:
                                ^(NSError *error,SuperPlayerModel *model) {
@@ -301,7 +305,7 @@ static UISlider * _volumeSlider;
     [self.controlView setPlayState:YES];
     self.isPauseByUser = NO;
     self.state = StatePlaying;
-    if (self.isLive) {
+    if (self.finalLive) {
         [_livePlayer resume];
     } else {
         [_vodPlayer resume];
@@ -318,13 +322,14 @@ static UISlider * _volumeSlider;
     [self.controlView setPlayState:NO];
     self.isPauseByUser = YES;
     self.state = StatePause;
-    if (self.isLive) {
+    if (self.finalLive) {
         [_livePlayer pause];
     } else {
         [_vodPlayer pause];
     }
 }
 #pragma mark - Control View Configuration
+
 - (void)resetControlViewWithLive:(BOOL)isLive
                    shiftPlayback:(BOOL)isShiftPlayback
                        isPlaying:(BOOL)isPlaying
@@ -367,11 +372,11 @@ static UISlider * _volumeSlider;
     [self.livePlayer removeVideoWidget];
     
     self.liveProgressTime = self.maxLiveProgressTime = 0;
-    
+
     int liveType = [self livePlayerType];
     /// 非直播类型, 需要强制用点播播放器, 用于解决部分源无法播放的问题
     if (liveType == -1) {
-        self.isLive = NO;
+        self.finalLive = NO;
     }
     
     self.isLoaded = NO;
@@ -384,7 +389,7 @@ static UISlider * _volumeSlider;
     NSString *videoURL = self.playerModel.playingDefinitionUrl;
     // 时移
     [TXLiveBase setAppID:[NSString stringWithFormat:@"%ld", _playerModel.appId]];
-    if (self.isLive) {
+    if (self.finalLive) {
         if (!self.livePlayer) {
             self.livePlayer = [[TXLivePlayer alloc] init];
             self.livePlayer.delegate = self;
@@ -419,27 +424,7 @@ static UISlider * _volumeSlider;
         }
         config.progressInterval = 0.02;
         self.vodPlayer.token = self.playerModel.drmToken;
-        //        if (_playerModel.videoId.version == FileIdV3) {
-        //            if ([_playerModel.drmType isEqualToString:kDrmType_FairPlay]) {
-        //                config.certificate = self.playerModel.certificate;
-        //                self.vodPlayer.token = self.playerModel.token;
-        //                NSLog(@"FairPlay播放");
-        //            } else if ([_playerModel.drmType isEqualToString:kDrmType_SimpleAES]) {
-        //                self.vodPlayer.token = self.playerModel.token;
-        //                NSLog(@"SimpleAES播放");
-        //            } else {
-        //                // 降级播放
-        //                self.vodPlayer.token = nil;
-        //            }
-        //        } else if (_playerModel.token) {
-        //            if (self.playerModel.certificate) {
-        //                config.certificate = self.playerModel.certificate;
-        //            }
-        //            self.vodPlayer.token = self.playerModel.token;
-        //        } else {
-        //            self.vodPlayer.token = nil;
-        //        }
-        
+
         config.headers = self.playerConfig.headers;
         
         [self.vodPlayer setConfig:config];
@@ -820,7 +805,7 @@ static UISlider * _volumeSlider;
 - (void)appDidEnterBackground:(NSNotification *)notify {
     NSLog(@"appDidEnterBackground");
     self.didEnterBackground = YES;
-    if (self.isLive) {
+    if (self.finalLive) {
         return;
     }
     if (!self.isPauseByUser && (self.state != StateStopped && self.state != StateFailed)) {
@@ -835,7 +820,7 @@ static UISlider * _volumeSlider;
 - (void)appDidEnterPlayground:(NSNotification *)notify {
     NSLog(@"appDidEnterPlayground");
     self.didEnterBackground = NO;
-    if (self.isLive) {
+    if (self.finalLive) {
         return;
     }
     if (!self.isPauseByUser && (self.state != StateStopped && self.state != StateFailed)) {
@@ -874,7 +859,7 @@ static UISlider * _volumeSlider;
     if (!self.isLoaded || self.state == StateStopped) {
         return;
     }
-    if (self.isLive) {
+    if (self.finalLive) {
         [DataReport report:@"timeshift" param:nil];
         int ret = [self.livePlayer seek:dragedSeconds];
         if (ret != 0) {
@@ -914,7 +899,9 @@ static UISlider * _volumeSlider;
         if (!self.isLoaded) { return NO; }
         if (self.isLockScreen) { return NO; }
         if (SuperPlayerWindowShared.isShowing) { return NO; }
-        
+        if (self.isLive) {
+            return NO;
+        }
         if (self.disableGesture) {
             if (!self.isFullScreen) {
                 return NO;
@@ -1091,7 +1078,7 @@ static UISlider * _volumeSlider;
     NSString *currentTimeStr = [StrUtils timeFormat:draggedTime];
     NSString *totalTimeStr   = [StrUtils timeFormat:totalTime];
     NSString *timeStr        = [NSString stringWithFormat:@"%@ / %@", currentTimeStr, totalTimeStr];
-    if (self.isLive) {
+    if (self.finalLive) {
         timeStr = [NSString stringWithFormat:@"%@", currentTimeStr];
     }
     
@@ -1107,7 +1094,7 @@ static UISlider * _volumeSlider;
         if (totalTime > 0) {
             sliderValue = (CGFloat)draggedTime/totalTime;
         }
-        if (self.isLive && totalTime > MAX_SHIFT_TIME) {
+        if (self.finalLive && totalTime > MAX_SHIFT_TIME) {
             CGFloat base = totalTime - MAX_SHIFT_TIME;
             if (self.sumTime < base)
                 self.sumTime = base;
@@ -1245,17 +1232,22 @@ static UISlider * _volumeSlider;
     }
 }
 
+- (void)setIsLive:(BOOL)isLive {
+    _isLive = isLive;
+    self.finalLive = isLive;
+}
+
 #pragma mark - Getter
 
 - (CGFloat)playDuration {
-    if (self.isLive) {
+    if (self.finalLive) {
         return self.maxLiveProgressTime;
     }
     return self.vodPlayer.duration;
 }
 
 - (CGFloat)playCurrentTime {
-    if (self.isLive) {
+    if (self.finalLive) {
         if (self.isShiftPlayback) {
             return self.liveProgressTime;
         }
@@ -1323,7 +1315,7 @@ static UISlider * _volumeSlider;
     
     self.playerModel.playingDefinition = definition;
     NSString *url = self.playerModel.playingDefinitionUrl;
-    if (self.isLive) {
+    if (self.finalLive) {
         [self.livePlayer switchStream:url];
         [self showMiddleBtnMsg:[NSString stringWithFormat:@"正在切换到%@...", definition] withAction:ActionNone];
     } else {
@@ -1338,7 +1330,7 @@ static UISlider * _volumeSlider;
 }
 
 - (void)controlViewConfigUpdate:(SuperPlayerView *)controlView withReload:(BOOL)reload {
-    if (self.isLive) {
+    if (self.finalLive) {
         [self.livePlayer setMute:self.playerConfig.mute];
         [self.livePlayer setRenderMode:self.playerConfig.renderMode];
     } else {
@@ -1348,7 +1340,7 @@ static UISlider * _volumeSlider;
         [self.vodPlayer setRenderMode:self.playerConfig.renderMode];
     }
     if (reload) {
-        if (!self.isLive)
+        if (!self.finalLive)
             self.startTime = [self.vodPlayer currentPlaybackTime];
         self.isShiftPlayback = NO;
         [self configTXPlayer]; // 软硬解需要重启
@@ -1357,7 +1349,7 @@ static UISlider * _volumeSlider;
 
 
 - (void)controlViewReload:(UIView *)controlView {
-    if (self.isLive) {
+    if (self.finalLive) {
         self.isShiftPlayback = NO;
         self.isLoaded = NO;
         [self.livePlayer resumeLive];
@@ -1424,7 +1416,7 @@ static UISlider * _volumeSlider;
     
     //计算出拖动的当前秒数
     CGFloat dragedSeconds = floorf(totalTime * pos);
-    if (self.isLive && totalTime > MAX_SHIFT_TIME) {
+    if (self.finalLive && totalTime > MAX_SHIFT_TIME) {
         CGFloat base = totalTime - MAX_SHIFT_TIME;
         dragedSeconds = floor(MAX_SHIFT_TIME * pos) + base;
     }
@@ -1714,8 +1706,7 @@ static UISlider * _volumeSlider;
     NSString *scheme = [[components scheme] lowercaseString];
     if ([scheme isEqualToString:@"rtmp"]) {
         playType = PLAY_TYPE_LIVE_RTMP;
-    } else if ([scheme hasPrefix:@"http"]
-               && [[components path].lowercaseString hasSuffix:@".flv"]) {
+    } else if ([scheme hasPrefix:@"http"] && [[components path].lowercaseString hasSuffix:@".flv"]) {
         playType = PLAY_TYPE_LIVE_FLV;
     }
     return playType;
@@ -1725,7 +1716,7 @@ static UISlider * _volumeSlider;
     if (self.reportTime == nil)
         return;
     int usedtime = -[self.reportTime timeIntervalSinceNow];
-    if (self.isLive) {
+    if (self.finalLive) {
         [DataReport report:@"superlive" param:@{@"usedtime":@(usedtime)}];
     } else {
         [DataReport report:@"supervod" param:@{@"usedtime":@(usedtime), @"fileid":@(self.playerModel.videoId.fileId?1:0)}];
@@ -1773,7 +1764,7 @@ static UISlider * _volumeSlider;
         case ActionNone:
             break;
         case ActionContinueReplay: {
-            if (!self.isLive) {
+            if (!self.finalLive) {
                 self.startTime = self.playCurrentTime;
             }
             [self configTXPlayer];

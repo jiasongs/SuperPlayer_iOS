@@ -128,11 +128,7 @@ static UISlider * _volumeSlider;
 - (void)dealloc {
     LOG_ME;
     // 移除通知
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    if (![UIDevice currentDevice].generatesDeviceOrientationNotifications) {
-        [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
-    }
-    
+    [self removeNotifications];
     [self reportPlay];
     [self.netWatcher stopWatch];
     [self.volumeView removeFromSuperview];
@@ -144,6 +140,8 @@ static UISlider * _volumeSlider;
  *  添加观察者、通知
  */
 - (void)addNotifications {
+    /// 先移除通知
+    [self removeNotifications];
     // app退到后台
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterBackground:) name:UIApplicationWillResignActiveNotification object:nil];
     // app进入前台
@@ -155,6 +153,13 @@ static UISlider * _volumeSlider;
     }
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDeviceOrientationChange) name:UIDeviceOrientationDidChangeNotification object:nil];
     
+}
+
+- (void)removeNotifications {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    if (![UIDevice currentDevice].generatesDeviceOrientationNotifications) {
+        [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    }
 }
 
 #pragma mark - layoutSubviews
@@ -280,7 +285,7 @@ static UISlider * _volumeSlider;
 - (void)resetPlayer {
     LOG_ME;
     // 移除通知
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self removeNotifications];
     // 暂停
     [self pause];
     

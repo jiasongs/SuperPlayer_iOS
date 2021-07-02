@@ -27,7 +27,7 @@
 /** 重新播放 */
 - (void)controlViewReload:(UIView *)controlView;
 /** 切换线路 */
-- (void)controlViewRoute:(UIView *)controlView;
+- (void)controlViewChangeLine:(UIView *)controlView;
 /** seek事件，pos 0~1 */
 - (void)controlViewSeek:(UIView *)controlView where:(CGFloat)pos;
 /** 滑动预览，pos 0~1 */

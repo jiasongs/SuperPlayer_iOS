@@ -71,7 +71,8 @@
 /** 重播按钮 */
 @property (nonatomic, strong) UIButton       *repeatBtn;
 /** 线路按钮 */
-@property (nonatomic, strong) UIButton *routeButton;
+@property (nonatomic, strong) UIButton *lineButton;
+@property (nullable, nonatomic, copy) NSString *lineText;
 
 /** 是否全屏播放 */
 @property (nonatomic, assign,getter=isFullScreen)BOOL fullScreen;

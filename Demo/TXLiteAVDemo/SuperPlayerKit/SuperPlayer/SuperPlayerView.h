@@ -12,7 +12,7 @@
 /// 返回事件
 - (void)superPlayerBackAction:(SuperPlayerView *)player;
 /// 切换线路
-- (void)superPlayerRouteAction:(SuperPlayerView *)player;
+- (void)superPlayerChangeLineAction:(SuperPlayerView *)player;
 /// 全屏改变通知
 - (void)superPlayerFullScreenChanged:(SuperPlayerView *)player;
 /// 播放开始通知

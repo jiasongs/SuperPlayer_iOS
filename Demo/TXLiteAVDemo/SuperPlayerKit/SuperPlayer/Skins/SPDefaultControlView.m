@@ -48,7 +48,7 @@
         
         
         [self addSubview:self.backLiveBtn];
-        [self addSubview:self.routeButton];
+        [self addSubview:self.lineButton];
         
         // 添加子控件的约束
         [self makeSubViewsConstraints];
@@ -58,6 +58,9 @@
         self.moreBtn.hidden     = YES;
         self.resolutionBtn.hidden   = YES;
         self.moreContentView.hidden = YES;
+        
+        self.lineText = @"线路1";
+        
         // 初始化时重置controlView
         [self playerResetControlView];
     }
@@ -134,12 +137,12 @@
     }];
     [self.totalTimeLabel setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
     [self.totalTimeLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.trailing.equalTo(self.routeButton.mas_leading);
+        make.trailing.equalTo(self.lineButton.mas_leading);
         make.centerY.equalTo(self.startBtn.mas_centerY);
         make.width.mas_equalTo(60);
     }];
-    [self.routeButton setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
-    [self.routeButton mas_makeConstraints:^(MASConstraintMaker *make) {
+    [self.lineButton setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
+    [self.lineButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.trailing.equalTo(self.fullScreenBtn.mas_leading);
         make.centerY.equalTo(self.startBtn.mas_centerY);
     }];
@@ -318,8 +321,8 @@
     [self fadeOut:0.1];
 }
 
-- (void)onPressRoute:(UIButton *)sender {
-    [self.delegate controlViewRoute:self];
+- (void)onPressLine:(UIButton *)sender {
+    [self.delegate controlViewChangeLine:self];
 }
 
 - (void)setDisableBackBtn:(BOOL)disableBackBtn {
@@ -394,7 +397,7 @@
     self.resolutionView.hidden  = YES;
     
     [self.totalTimeLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
-        make.trailing.equalTo(self.routeButton.mas_leading);
+        make.trailing.equalTo(self.lineButton.mas_leading);
         make.centerY.equalTo(self.startBtn.mas_centerY);
         make.width.mas_equalTo(self.isLive?10:60);
     }];
@@ -599,15 +602,14 @@
     return _moreContentView;
 }
 
-- (UIButton *)routeButton {
-    if (!_routeButton) {
-        _routeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_routeButton setTitle:@"线路1" forState:UIControlStateNormal];
-        _routeButton.titleLabel.font = [UIFont systemFontOfSize:13];
-        [_routeButton addTarget:self action:@selector(onPressRoute:) forControlEvents:UIControlEventTouchUpInside];
-        _routeButton.contentEdgeInsets = UIEdgeInsetsMake(3, 6, 3, 6);
+- (UIButton *)lineButton {
+    if (!_lineButton) {
+        _lineButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _lineButton.titleLabel.font = [UIFont systemFontOfSize:13];
+        [_lineButton addTarget:self action:@selector(onPressLine:) forControlEvents:UIControlEventTouchUpInside];
+        _lineButton.contentEdgeInsets = UIEdgeInsetsMake(3, 6, 3, 6);
     }
-    return _routeButton;
+    return _lineButton;
 }
 
 #pragma mark - UIGestureRecognizerDelegate
@@ -780,6 +782,11 @@
 {
     [super setTitle:title];
     self.titleLabel.text = title;
+}
+
+- (void)setLineText:(nullable NSString *)lineText {
+    _lineText = lineText;
+    [self.lineButton setTitle:lineText forState:UIControlStateNormal];
 }
 
 #pragma clang diagnostic pop

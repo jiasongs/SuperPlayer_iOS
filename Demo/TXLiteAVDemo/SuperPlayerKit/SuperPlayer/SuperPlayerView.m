@@ -651,7 +651,7 @@ static UISlider * _volumeSlider;
     if (orientation == UIDeviceOrientationPortrait) {
         [self _setInterfaceOrientation:UIDeviceOrientationPortrait];
     } else if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
-        [self _setInterfaceOrientation:UIDeviceOrientationLandscapeRight];
+        [self _setInterfaceOrientation:UIDeviceOrientationLandscapeLeft];
     }
 }
 

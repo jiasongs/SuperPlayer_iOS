@@ -44,7 +44,7 @@
 
 - (void)initUI {
     _progressView                   = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
-    _progressView.progressTintColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    _progressView.progressTintColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0];
     _progressView.trackTintColor    = [UIColor clearColor];
     /// 先隐藏, UI显示上有错位
     _progressView.hidden = YES;
@@ -105,7 +105,6 @@
 }
 
 - (void)onClickHolder:(UIControl *)sender {
-    NSLog(@"clokc");
     for (PlayerPoint *point in self.pointArray) {
         if (point.holder == sender) {
             if ([self.delegate respondsToSelector:@selector(onPlayerPointSelected:)])
@@ -120,6 +119,16 @@
         point.holder.hidden = hiddenPoints;
     }
     _hiddenPoints = hiddenPoints;
+}
+
+- (CGRect)trackRectForBounds:(CGRect)bounds {
+    CGRect trackRect = [super trackRectForBounds:bounds];
+    [_progressView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.mas_left).offset(trackRect.origin.x);
+        make.right.equalTo(self.mas_right).offset(-trackRect.origin.x);
+        make.height.mas_equalTo(trackRect.size.height);
+    }];
+    return trackRect;
 }
 
 @end

@@ -30,14 +30,6 @@
 
 @implementation PlayerSlider
 
-/*
- // Only override drawRect: if you perform custom drawing.
- // An empty implementation adversely affects performance during animation.
- - (void)drawRect:(CGRect)rect {
- // Drawing code
- }
- */
-
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     [self initUI];
@@ -54,6 +46,8 @@
     _progressView                   = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
     _progressView.progressTintColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     _progressView.trackTintColor    = [UIColor clearColor];
+    /// 先隐藏, UI显示上有错位
+    _progressView.hidden = YES;
     
     [self addSubview:_progressView];
     
@@ -128,17 +122,4 @@
     _hiddenPoints = hiddenPoints;
 }
 
-//- (CGRect)thumbRectForBounds:(CGRect)bounds trackRect:(CGRect)rect value:(float)value {
-//    
-//    rect.origin.x = rect.origin.x - 10 ;
-//    
-//    rect.size.width = rect.size.width +20;
-//    
-//    return CGRectInset ([super thumbRectForBounds:bounds
-//                                        trackRect:rect
-//                                            value:value],
-//                        10 ,
-//                        10);
-//    
-//}
 @end

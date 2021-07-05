@@ -549,39 +549,6 @@ static UISlider * _volumeSlider;
     return targetOrientation;
 }
 
-- (void)_switchToFullScreen:(BOOL)fullScreen {
-    _isFullScreen = fullScreen;
-    
-    /* FIXXXX
-     UIDeviceOrientation targetOrientation = [self _orientationForFullScreen:fullScreen];// [UIDevice currentDevice].orientation;
-     
-     if (fullScreen) {
-     [self removeFromSuperview];
-     [[UIApplication sharedApplication].keyWindow addSubview:_fullScreenBlackView];
-     [_fullScreenBlackView mas_makeConstraints:^(MASConstraintMaker *make) {
-     make.width.equalTo(@(ScreenHeight));
-     make.height.equalTo(@(ScreenWidth));
-     make.center.equalTo([UIApplication sharedApplication].keyWindow);
-     }];
-     
-     [[UIApplication sharedApplication].keyWindow addSubview:self];
-     [self mas_remakeConstraints:^(MASConstraintMaker *make) {
-     if (IsIPhoneX) {
-     make.width.equalTo(@(ScreenHeight - self.mm_safeAreaTopGap * 2));
-     } else {
-     make.width.equalTo(@(ScreenHeight));
-     }
-     make.height.equalTo(@(ScreenWidth));
-     make.center.equalTo([UIApplication sharedApplication].keyWindow);
-     }];
-     [self.superview setNeedsLayout];
-     } else {
-     [_fullScreenBlackView removeFromSuperview];
-     [self addPlayerToFatherView:self.fatherView];
-     }
-     */
-}
-
 - (void)_switchToLayoutStyle:(SuperPlayerLayoutStyle)style {
     // 获取到当前状态条的方向
     
@@ -760,8 +727,18 @@ static UISlider * _volumeSlider;
 
 /** 全屏 */
 - (void)setFullScreen:(BOOL)fullScreen {
-    
     if (_isFullScreen != fullScreen) {
+        _isFullScreen = fullScreen;
+        /// 更新UI
+        if ([self.controlView isKindOfClass:SPDefaultControlView.class]) {
+            SPDefaultControlView *controlView = (SPDefaultControlView *)self.controlView;
+            controlView.fullScreen = fullScreen;
+            controlView.fullScreenBtn.selected = fullScreen;
+        } else if ([self.controlView isKindOfClass:SPWeiboControlView.class]) {
+            SPWeiboControlView *controlView = (SPWeiboControlView *)self.controlView;
+            controlView.fullScreen = fullScreen;
+            controlView.fullScreenBtn.selected = fullScreen;
+        }
         [self _adjustTransform:[self _orientationForFullScreen:fullScreen]];
     }
     /*
@@ -854,9 +831,7 @@ static UISlider * _volumeSlider;
     if (!UIDeviceOrientationIsValidInterfaceOrientation(orientation)) {
         return;
     }
-    BOOL shouldFullScreen = UIDeviceOrientationIsLandscape(orientation);
-    [self _switchToFullScreen:shouldFullScreen];
-    [self _setInterfaceOrientation:orientation];
+    self.isFullScreen = UIDeviceOrientationIsLandscape(orientation);
 }
 
 #pragma mark -
@@ -1294,7 +1269,7 @@ static UISlider * _volumeSlider;
 }
 
 - (void)controlViewChangeScreen:(SuperPlayerControlView *)controlView withFullScreen:(BOOL)isFullScreen {
-    self.isFullScreen = !self.isFullScreen;
+    self.isFullScreen = isFullScreen;
 }
 
 - (void)controlViewChangeLine:(SuperPlayerControlView *)controlView {

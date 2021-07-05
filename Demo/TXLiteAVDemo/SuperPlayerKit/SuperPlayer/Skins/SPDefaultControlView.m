@@ -230,9 +230,7 @@
 }
 
 - (void)fullScreenBtnClick:(UIButton *)sender {
-    sender.selected = !sender.selected;
-    self.fullScreen = !self.fullScreen;
-    [self.delegate controlViewChangeScreen:self withFullScreen:YES];
+    [self.delegate controlViewChangeScreen:self withFullScreen:!self.isFullScreen];
     [self fadeOut:3];
 }
 
@@ -354,7 +352,6 @@
  *  屏幕方向发生变化会调用这里
  */
 - (void)setOrientationLandscapeConstraint {
-    self.fullScreen             = YES;
     self.lockBtn.hidden         = NO;
     self.fullScreenBtn.selected = self.isLockScreen;
     self.fullScreenBtn.hidden   = YES;
@@ -385,9 +382,7 @@
  *  设置竖屏的约束
  */
 - (void)setOrientationPortraitConstraint {
-    self.fullScreen             = NO;
     self.lockBtn.hidden         = YES;
-    self.fullScreenBtn.selected = NO;
     self.fullScreenBtn.hidden   = NO;
     self.resolutionBtn.hidden   = YES;
     self.moreBtn.hidden         = YES;

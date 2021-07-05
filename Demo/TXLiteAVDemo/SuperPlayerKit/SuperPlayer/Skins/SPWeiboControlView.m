@@ -226,8 +226,7 @@
 }
 
 - (void)fullScreenBtnClick:(UIButton *)sender {
-    sender.selected = !sender.selected;
-    [self.delegate controlViewChangeScreen:self withFullScreen:sender.selected];
+    [self.delegate controlViewChangeScreen:self withFullScreen:!self.isFullScreen];
 }
 
 - (void)progressSliderTouchBegan:(UISlider *)sender {
@@ -405,8 +404,6 @@
 }
 
 - (void)setOrientationLandscapeConstraint {
-    self.fullScreen             = YES;
-    self.fullScreenBtn.selected = YES;
     self.moreBtn.hidden = NO;
     self.backBtn.hidden = NO;
     self.muteBtn.hidden = NO;
@@ -418,8 +415,6 @@
 }
 
 - (void)setOrientationPortraitConstraint {
-    self.fullScreen             = NO;
-    self.fullScreenBtn.selected = NO;
     self.moreBtn.hidden = YES;
     self.backBtn.hidden = YES;
     self.muteBtn.hidden = YES;

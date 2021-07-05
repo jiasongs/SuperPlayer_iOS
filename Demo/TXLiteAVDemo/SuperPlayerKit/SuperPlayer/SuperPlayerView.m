@@ -1182,6 +1182,11 @@ static UISlider * _volumeSlider;
     [controlView setPointArray:_controlView.pointArray];
 }
 
+- (void)setTitle:(NSString *)title {
+    _title = title;
+    self.controlView.title = title;
+}
+
 - (SuperPlayerControlView *)controlView
 {
     if (_controlView == nil) {

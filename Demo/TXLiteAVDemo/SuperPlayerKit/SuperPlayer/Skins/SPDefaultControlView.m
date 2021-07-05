@@ -46,7 +46,6 @@
         
         [self.topImageView addSubview:self.titleLabel];
         
-        
         [self addSubview:self.backLiveBtn];
         [self addSubview:self.lineButton];
         
@@ -326,6 +325,19 @@
 - (void)setDisableBackBtn:(BOOL)disableBackBtn {
     _disableBackBtn = disableBackBtn;
     self.backBtn.hidden = disableBackBtn;
+    if (disableBackBtn) {
+        [self.titleLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.leading.equalTo(self.topImageView.mas_leading).offset(10);
+            make.centerY.equalTo(self.topImageView.mas_centerY);
+            make.trailing.equalTo(self.captureBtn.mas_leading).offset(-10);
+        }];
+    } else {
+        [self.titleLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.leading.equalTo(self.backBtn.mas_trailing).offset(5);
+            make.centerY.equalTo(self.backBtn.mas_centerY);
+            make.trailing.equalTo(self.captureBtn.mas_leading).offset(-10);
+        }];
+    }
 }
 
 - (void)setDisableMoreBtn:(BOOL)disableMoreBtn {

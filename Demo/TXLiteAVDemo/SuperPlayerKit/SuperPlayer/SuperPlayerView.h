@@ -89,6 +89,9 @@ typedef NS_ENUM(NSInteger, SuperPlayerLayoutStyle) {
 @property SuperPlayerViewConfig *playerConfig;
 /// 循环播放
 @property (nonatomic) BOOL loop;
+/// 标题
+@property (nullable, nonatomic, copy) NSString *title;
+
 /**
  * 视频雪碧图
  */

@@ -739,6 +739,10 @@ static UISlider * _volumeSlider;
             controlView.fullScreen = fullScreen;
             controlView.fullScreenBtn.selected = fullScreen;
         }
+        if ([self.delegate respondsToSelector:@selector(superPlayerFullScreenChanged:)]) {
+            [self.delegate superPlayerFullScreenChanged:self];
+        }
+        
         [self _adjustTransform:[self _orientationForFullScreen:fullScreen]];
     }
     /*
@@ -1275,13 +1279,6 @@ static UISlider * _volumeSlider;
 - (void)controlViewChangeLine:(SuperPlayerControlView *)controlView {
     if ([self.delegate respondsToSelector:@selector(superPlayerChangeLineAction:)]) {
         [self.delegate superPlayerChangeLineAction:self];
-    }
-}
-
-- (void)controlViewDidChangeScreen:(UIView *)controlView
-{
-    if ([self.delegate respondsToSelector:@selector(superPlayerFullScreenChanged:)]) {
-        [self.delegate superPlayerFullScreenChanged:self];
     }
 }
 

@@ -514,25 +514,7 @@ static UISlider * _volumeSlider;
     
 }
 
-#pragma mark - KVO
-
-/**
- *  设置横屏的约束
- */
-- (void)setOrientationLandscapeConstraint:(UIInterfaceOrientation)orientation {
-    _isFullScreen = YES;
-    //    [self _switchToLayoutStyle:orientation];
-}
-
-/**
- *  设置竖屏的约束
- */
-- (void)setOrientationPortraitConstraint {
-    
-    [self addPlayerToFatherView:self.fatherView];
-    _isFullScreen = NO;
-    //    [self _switchToLayoutStyle:UIInterfaceOrientationPortrait];
-}
+#pragma mark - 屏幕旋转相关
 
 - (UIDeviceOrientation)_orientationForFullScreen:(BOOL)fullScreen {
     UIDeviceOrientation targetOrientation = [UIDevice currentDevice].orientation;
@@ -544,87 +526,8 @@ static UISlider * _volumeSlider;
         if (!UIDeviceOrientationIsPortrait(targetOrientation)) {
             targetOrientation = UIDeviceOrientationPortrait;
         }
-        //    targetOrientation = (UIDeviceOrientation)[UIApplication sharedApplication].statusBarOrientation;
     }
     return targetOrientation;
-}
-
-- (void)_switchToLayoutStyle:(SuperPlayerLayoutStyle)style {
-    // 获取到当前状态条的方向
-    
-    //    UIInterfaceOrientation currentOrientation = [UIDevice currentDevice].orientation;
-    // 判断如果当前方向和要旋转的方向一致,那么不做任何操作
-    //    if (currentOrientation == orientation) { return; }
-    
-    /* FIXXXX
-     // 根据要旋转的方向,使用Masonry重新修改限制
-     if (style == SuperPlayerLayoutStyleFullScreen) {//
-     // 这个地方加判断是为了从全屏的一侧,直接到全屏的另一侧不用修改限制,否则会出错;
-     if (_layoutStyle != SuperPlayerLayoutStyleFullScreen)  { //UIInterfaceOrientationIsPortrait(currentOrientation)) {
-     [self removeFromSuperview];
-     [[UIApplication sharedApplication].keyWindow addSubview:_fullScreenBlackView];
-     [_fullScreenBlackView mas_remakeConstraints:^(MASConstraintMaker *make) {
-     make.width.equalTo(@(ScreenHeight));
-     make.height.equalTo(@(ScreenWidth));
-     make.center.equalTo([UIApplication sharedApplication].keyWindow);
-     }];
-     
-     [[UIApplication sharedApplication].keyWindow addSubview:self];
-     [self mas_remakeConstraints:^(MASConstraintMaker *make) {
-     if (IsIPhoneX) {
-     make.width.equalTo(@(ScreenHeight - self.mm_safeAreaTopGap * 2));
-     } else {
-     make.width.equalTo(@(ScreenHeight));
-     }
-     make.height.equalTo(@(ScreenWidth));
-     make.center.equalTo([UIApplication sharedApplication].keyWindow);
-     }];
-     }
-     } else {
-     [_fullScreenBlackView removeFromSuperview];
-     }
-     */
-    
-    
-    /* FIXXXX
-     self.controlView.compact = style == SuperPlayerLayoutStyleCompact;
-     [[UIApplication sharedApplication].keyWindow  layoutIfNeeded];
-     */
-    
-    // iOS6.0之后,设置状态条的方法能使用的前提是shouldAutorotate为NO,也就是说这个视图控制器内,旋转要关掉;
-    // 也就是说在实现这个方法的时候-(BOOL)shouldAutorotate返回值要为NO
-    /*
-     [[UIApplication sharedApplication] setStatusBarOrientation:orientation animated:NO];
-     [UIView beginAnimations:nil context:nil];
-     [UIView setAnimationDuration:0.3];
-     // 更改了状态条的方向,但是设备方向UIInterfaceOrientation还是正方向的,这就要设置给你播放视频的视图的方向设置旋转
-     // 给你的播放视频的view视图设置旋转
-     self.transform = CGAffineTransformIdentity;
-     self.transform = [self getTransformRotationAngleOfOrientation:[UIDevice currentDevice].orientation];
-     
-     _fullScreenContainerView.transform = self.transform;
-     // 开始旋转
-     [UIView commitAnimations];
-     
-     [self.fatherView.mm_viewController setNeedsStatusBarAppearanceUpdate];
-     _layoutStyle = style;
-     */
-}
-
-- (void)_adjustTransform:(UIDeviceOrientation)orientation {
-    /* FIXXXX
-     [UIView beginAnimations:nil context:nil];
-     [UIView setAnimationDuration:0.3];
-     
-     self.transform = [self getTransformRotationAngleOfOrientation:orientation];
-     _fullScreenBlackView.transform = self.transform;
-     [UIView commitAnimations];
-     */
-    if (orientation == UIDeviceOrientationPortrait) {
-        [self _setInterfaceOrientation:UIDeviceOrientationPortrait];
-    } else if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
-        [self _setInterfaceOrientation:UIDeviceOrientationLandscapeLeft];
-    }
 }
 
 - (void)_setInterfaceOrientation:(UIDeviceOrientation)orientation {
@@ -633,53 +536,6 @@ static UISlider * _volumeSlider;
     } else {
         [[UIDevice currentDevice] setValue:@(UIInterfaceOrientationUnknown) forKey:@"orientation"];
         [[UIDevice currentDevice] setValue:@(orientation) forKey:@"orientation"];
-    }
-}
-
-/**
- * 获取变换的旋转角度
- *
- * @return 变换矩阵
- */
-- (CGAffineTransform)getTransformRotationAngleOfOrientation:(UIDeviceOrientation)orientation {
-    // 状态条的方向已经设置过,所以这个就是你想要旋转的方向
-    UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
-    if (interfaceOrientation == (UIInterfaceOrientation)orientation) {
-        return CGAffineTransformIdentity;
-    }
-    // 根据要进行旋转的方向来计算旋转的角度
-    if (orientation == UIInterfaceOrientationPortrait) {
-        return CGAffineTransformIdentity;
-    } else if (orientation == UIInterfaceOrientationLandscapeLeft){
-        return CGAffineTransformMakeRotation(-M_PI_2);
-    } else if(orientation == UIInterfaceOrientationLandscapeRight){
-        return CGAffineTransformMakeRotation(M_PI_2);
-    }
-    return CGAffineTransformIdentity;
-}
-
-#pragma mark 屏幕转屏相关
-
-/**
- *  屏幕转屏
- *
- *  @param orientation 屏幕方向
- */
-- (void)interfaceOrientation:(UIInterfaceOrientation)orientation {
-    if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) {
-        // 设置横屏
-        [self setOrientationLandscapeConstraint:orientation];
-    } else if (orientation == UIInterfaceOrientationPortrait) {
-        // 设置竖屏
-        [self setOrientationPortraitConstraint];
-    }
-}
-
-- (SuperPlayerLayoutStyle)defaultStyleForDeviceOrientation:(UIDeviceOrientation)orientation {
-    if (UIDeviceOrientationIsPortrait(orientation)) {
-        return SuperPlayerLayoutStyleCompact;
-    } else {
-        return SuperPlayerLayoutStyleFullScreen;
     }
 }
 
@@ -742,23 +598,9 @@ static UISlider * _volumeSlider;
         if ([self.delegate respondsToSelector:@selector(superPlayerFullScreenChanged:)]) {
             [self.delegate superPlayerFullScreenChanged:self];
         }
-        
-        [self _adjustTransform:[self _orientationForFullScreen:fullScreen]];
+        /// 设置屏幕旋转
+        [self _setInterfaceOrientation:[self _orientationForFullScreen:fullScreen]];
     }
-    /*
-     self.controlView.compact = !_isFullScreen;
-     if (fullScreen) {
-     UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
-     if (orientation == UIDeviceOrientationLandscapeRight) {
-     [self interfaceOrientation:UIInterfaceOrientationLandscapeLeft];
-     } else {
-     [self interfaceOrientation:UIInterfaceOrientationLandscapeRight];
-     }
-     } else {
-     [self setOrientationPortraitConstraint];
-     [self interfaceOrientation:UIInterfaceOrientationPortrait];
-     }
-     */
 }
 
 /**

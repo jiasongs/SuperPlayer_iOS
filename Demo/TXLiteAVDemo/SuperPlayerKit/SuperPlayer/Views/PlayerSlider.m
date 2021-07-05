@@ -46,7 +46,7 @@
     _progressView                   = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
     _progressView.progressTintColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0];
     _progressView.trackTintColor    = [UIColor clearColor];
-    /// 先隐藏, UI显示上有错位
+    /// 先隐藏, UI显示上有错位, 暂时未解决
     _progressView.hidden = YES;
     
     [self addSubview:_progressView];

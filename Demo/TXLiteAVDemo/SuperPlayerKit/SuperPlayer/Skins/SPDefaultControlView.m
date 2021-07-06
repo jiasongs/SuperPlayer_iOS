@@ -364,7 +364,7 @@
  *  屏幕方向发生变化会调用这里
  */
 - (void)setOrientationLandscapeConstraint {
-    self.lockBtn.hidden         = NO;
+    self.lockBtn.hidden         = YES;
     self.fullScreenBtn.selected = self.isLockScreen;
     self.fullScreenBtn.hidden   = YES;
     self.resolutionBtn.hidden   = self.resolutionArray.count == 0;
@@ -464,7 +464,7 @@
         [_lockBtn setImage:SuperPlayerImage(@"unlock-nor") forState:UIControlStateNormal];
         [_lockBtn setImage:SuperPlayerImage(@"lock-nor") forState:UIControlStateSelected];
         [_lockBtn addTarget:self action:@selector(lockScrrenBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-        
+        _lockBtn.hidden = YES;
     }
     return _lockBtn;
 }
@@ -642,7 +642,7 @@
         }
     }
     
-    self.lockBtn.hidden = !self.isFullScreen;
+    self.lockBtn.hidden = YES;
     self.isShowSecondView = NO;
     self.pointJumpBtn.hidden = YES;
 }
@@ -657,7 +657,7 @@
     self.resolutionView.hidden       = YES;
     self.backgroundColor             = [UIColor clearColor];
     self.moreBtn.enabled             = !self.disableMoreBtn;
-    self.lockBtn.hidden              = !self.isFullScreen;
+    self.lockBtn.hidden              = YES;
     
     self.danmakuBtn.enabled = YES;
     self.captureBtn.enabled = YES;

@@ -795,6 +795,7 @@
 - (void)setLineText:(nullable NSString *)lineText {
     _lineText = lineText;
     [self.lineButton setTitle:lineText forState:UIControlStateNormal];
+    self.lineButton.hidden = lineText.length == 0;
 }
 
 #pragma clang diagnostic pop
